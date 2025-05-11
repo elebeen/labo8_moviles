@@ -28,13 +28,28 @@ fun TaskScreen(viewModel: TaskViewModel) {
     val tasks by viewModel.tasks.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var newTaskDescription by remember { mutableStateOf("") }
+    var taskBeingEdited by remember { mutableStateOf<Task?>(null) }
 
     when (currentScreen) {
         "list" -> TaskListScreen(
             tasks = tasks,
             onToggleTask = { viewModel.toggleTaskCompletion(it) },
-            onDeleteAll = { coroutineScope.launch { viewModel.deleteAllTasks() } },
-            onFabClick = { currentScreen = "add" }
+            onDeleteAll = {
+                coroutineScope.launch {
+                    viewModel.deleteAllTasks()
+                }
+            },
+            onFabClick = { currentScreen = "add" },
+            onEdit = { task ->
+                taskBeingEdited = task
+                newTaskDescription = task.description
+                currentScreen = "edit"
+            },
+            deleteTask = { id ->
+                coroutineScope.launch {
+                    viewModel.deleteTask(id)
+                }
+            }
         )
         "add" -> AddTaskScreen(
             taskDescription = newTaskDescription,
@@ -49,6 +64,21 @@ fun TaskScreen(viewModel: TaskViewModel) {
             },
             onBack = { currentScreen = "list" }
         )
+        "edit" -> taskBeingEdited?.let { task ->
+            EditTaskScreen(
+                taskDescription = newTaskDescription,
+                onDescriptionChange = { newTaskDescription = it },
+                onUpdateTask = {
+                    coroutineScope.launch {
+                        viewModel.updateTask(task.id, newTaskDescription, task.isCompleted)
+                        newTaskDescription = ""
+                        taskBeingEdited = null
+                        currentScreen = "list"
+                    }
+                },
+                onBack = { currentScreen = "list" },
+            )
+        }
     }
 }
 
@@ -85,6 +115,18 @@ class FakeTaskViewModel : TaskViewModel(
 
         override suspend fun deleteAllTasks() {
             tasks.clear()
+        }
+
+        override suspend fun deleteTask(id: Int) {
+            tasks = tasks.filter { it.id != id }.toMutableList()
+        }
+
+        override suspend fun updateTask(
+            id: Int,
+            description: String,
+            isCompleted: Boolean
+        ) {
+            tasks = tasks.map { if (it.id == id) it.copy(description = description, isCompleted = isCompleted) else it }.toMutableList()
         }
     }
 )

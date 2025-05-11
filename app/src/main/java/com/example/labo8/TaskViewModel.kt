@@ -42,4 +42,18 @@ open class TaskViewModel(private val dao: TaskDao) : ViewModel(){
             _tasks.value = emptyList() // Vaciamos la lista en el estado
         }
     }
+
+    fun deleteTask(id: Int) {
+        viewModelScope.launch {
+            dao.deleteTask(id)
+            _tasks.value = dao.getAllTasks() // Recargamos la lista
+        }
+    }
+
+    fun updateTask(id: Int, description: String, isCompleted: Boolean) {
+        viewModelScope.launch {
+            dao.updateTask(id, description, isCompleted)
+            _tasks.value = dao.getAllTasks() // Recargamos la lista
+        }
+    }
 }

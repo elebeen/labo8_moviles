@@ -14,13 +14,19 @@ interface TaskDao {
     @Insert
     suspend fun insertTask(task: Task)
 
-
     // Marcar una tarea como completada o no completada
     @Update
     suspend fun updateTask(task: Task)
 
-
     // Eliminar todas las tareas
-    @Query("DELETE FROM tasks")
+    @Query("delete from tasks")
     suspend fun deleteAllTasks()
+
+    // Eliminar una tarea concreta
+    @Query("delete from tasks where id = :id")
+    suspend fun deleteTask(id: Int)
+
+    // Actualizar una tarea concreta
+    @Query("update tasks set description = :description, is_completed = :isCompleted where id = :id")
+    suspend fun updateTask(id: Int, description: String, isCompleted: Boolean)
 }
