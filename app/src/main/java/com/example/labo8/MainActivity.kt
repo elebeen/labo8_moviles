@@ -19,10 +19,8 @@ class MainActivity : ComponentActivity() {
                     "task_db"
                 ).build()
 
-
                 val taskDao = db.taskDao()
                 val viewModel = TaskViewModel(taskDao)
-
 
                 TaskScreen(viewModel)
             }

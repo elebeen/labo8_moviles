@@ -1,17 +1,15 @@
 package com.example.labo8
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,62 +17,98 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
 @Composable
 fun TaskScreen(viewModel: TaskViewModel) {
+    var currentScreen by remember { mutableStateOf("list") }
     val tasks by viewModel.tasks.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     var newTaskDescription by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        TextField(
-            value = newTaskDescription,
-            onValueChange = { newTaskDescription = it },
-            label = { Text("Nueva tarea") },
-            modifier = Modifier.fillMaxWidth()
+    when (currentScreen) {
+        "list" -> TaskListScreen(
+            tasks = tasks,
+            onToggleTask = { viewModel.toggleTaskCompletion(it) },
+            onDeleteAll = { coroutineScope.launch { viewModel.deleteAllTasks() } },
+            onFabClick = { currentScreen = "add" }
         )
-
-
-        Button(
-            onClick = {
+        "add" -> AddTaskScreen(
+            taskDescription = newTaskDescription,
+            onDescriptionChange = { newTaskDescription = it },
+            onDeleteAll = { coroutineScope.launch { viewModel.deleteAllTasks() } },
+            onAddTask = {
                 if (newTaskDescription.isNotEmpty()) {
                     viewModel.addTask(newTaskDescription)
                     newTaskDescription = ""
+                    currentScreen = "list"
                 }
             },
-            modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
-        ) {
-            Text("Agregar tarea")
-        }
-
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        tasks.forEach { task ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(text = task.description)
-                Button(onClick = { viewModel.toggleTaskCompletion(task) }) {
-                    Text(if (task.isCompleted) "Completada" else "Pendiente")
-                }
-            }
-        }
-
-
-        Button(
-            onClick = { coroutineScope.launch { viewModel.deleteAllTasks() } },
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
-        ) {
-            Text("Eliminar todas las tareas")
-        }
+            onBack = { currentScreen = "list" }
+        )
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun TaskScreenPreview() {
+    // Recuerda que no debes ejecutar código suspendido directamente en Preview
+    val viewModel = remember { FakeTaskViewModel() }
+
+    // Usamos LaunchedEffect para simular carga inicial si es necesario
+    LaunchedEffect(Unit) {
+        // Nada aquí por ahora; en preview, no se necesita recargar.
+    }
+
+    TaskScreen(viewModel = viewModel)
+}
+
+class FakeTaskViewModel : TaskViewModel(
+    dao = object : TaskDao {
+        private var tasks = mutableListOf<Task>(
+            Task(id = 1, description = "Escribir poesía", isCompleted = false),
+            Task(id = 2, description = "Leer libros antiguos", isCompleted = true)
+        )
+
+        override suspend fun getAllTasks(): List<Task> = tasks
+
+        override suspend fun insertTask(task: Task) {
+            tasks.add(task.copy(id = tasks.size + 1))
+        }
+
+        override suspend fun updateTask(task: Task) {
+            tasks = tasks.map { if (it.id == task.id) task else it }.toMutableList()
+        }
+
+        override suspend fun deleteAllTasks() {
+            tasks.clear()
+        }
+    }
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    modifier: Modifier = Modifier,
+    title: String,
+    onDeleteAll: () -> Unit
+) {
+    TopAppBar(
+        title = { Text(title) },
+        actions = {
+            IconButton(onClick = onDeleteAll) {
+                Icon(
+                    modifier = Modifier.padding(end = 16.dp),
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Eliminar todas las tareas",
+                    tint = Color.Red
+                )
+            }
+        },
+        modifier = modifier
+    )
+}
+
