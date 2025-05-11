@@ -34,14 +34,11 @@ fun EditTaskScreen(
                 titleContent = {
                     Column {
                         Text(
-                            text = "Today",
+                            text = "Editar tarea",
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = if (uncompletedTasksCount == 0)
-                                "Estás al día"
-                            else
-                                "Tareas pendientes: $uncompletedTasksCount",
+                            text = "Te equivocaste en algo?",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )

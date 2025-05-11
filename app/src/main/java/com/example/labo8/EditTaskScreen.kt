@@ -24,7 +24,6 @@ fun EditTaskScreen(
     onUpdateTask: () -> Unit,
     onBack: () -> Unit,
     taskDescription: String,
-    uncompletedTasksCount: Int = 0
 ) {
     Scaffold(
         topBar = {
@@ -38,10 +37,7 @@ fun EditTaskScreen(
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = if (uncompletedTasksCount == 0)
-                                "Estás al día"
-                            else
-                                "Tareas pendientes: $uncompletedTasksCount",
+                            text = "Te equivocaste en algo?",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )

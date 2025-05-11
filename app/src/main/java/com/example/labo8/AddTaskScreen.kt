@@ -24,7 +24,6 @@ fun AddTaskScreen(
     onAddTask: () -> Unit,
     onDeleteAll: () -> Unit,
     onBack: () -> Unit,
-    uncompletedTasksCount: Int = 0
 ) {
     Scaffold(
         topBar = {
@@ -38,10 +37,7 @@ fun AddTaskScreen(
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = if (uncompletedTasksCount == 0)
-                                "Estás al día"
-                            else
-                                "Tareas pendientes: $uncompletedTasksCount",
+                            text = "Añade todas tus tareas",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )

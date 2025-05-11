@@ -65,8 +65,7 @@ fun TaskScreen(viewModel: TaskViewModel) {
                     currentScreen = "list"
                 }
             },
-            onBack = { currentScreen = "list" },
-            uncompletedTasksCount = tasks.count { !it.isCompleted }
+            onBack = { currentScreen = "list" }
         )
         "edit" -> taskBeingEdited?.let { task ->
             EditTaskScreen(
@@ -80,8 +79,7 @@ fun TaskScreen(viewModel: TaskViewModel) {
                         currentScreen = "list"
                     }
                 },
-                onBack = { currentScreen = "list" },
-                uncompletedTasksCount = tasks.count { !it.isCompleted }
+                onBack = { currentScreen = "list" }
             )
         }
     }

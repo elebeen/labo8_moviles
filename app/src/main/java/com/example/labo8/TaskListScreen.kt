@@ -51,10 +51,13 @@ fun TaskListScreen(
                             style = MaterialTheme.typography.titleLarge
                         )
                         Text(
-                            text = if (uncompletedTasksCount == 0)
-                                "Estás al día"
-                            else
-                                "Tareas pendientes: $uncompletedTasksCount",
+                            text =
+                                if (tasks.isEmpty())
+                                    "No tienes tareas"
+                                else if (uncompletedTasksCount == 0)
+                                    "Estás al día"
+                                else
+                                    "Tareas pendientes: $uncompletedTasksCount",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )
