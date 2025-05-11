@@ -1,6 +1,5 @@
 package com.example.labo8
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,23 +17,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTaskScreen(
     taskDescription: String,
     onDescriptionChange: (String) -> Unit,
     onAddTask: () -> Unit,
     onDeleteAll: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    uncompletedTasksCount: Int = 0
 ) {
     Scaffold(
         topBar = {
             TopBar(
-                title = "Add Task",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFBFBF9)),
-                onDeleteAll = onDeleteAll
+                modifier = Modifier.fillMaxWidth(),
+                onDeleteAll = onDeleteAll,
+                titleContent = {
+                    Column {
+                        Text(
+                            text = "Añadir tarea",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            text = if (uncompletedTasksCount == 0)
+                                "Estás al día"
+                            else
+                                "Tareas pendientes: $uncompletedTasksCount",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
             )
         },
         bottomBar = { BottomBar() },

@@ -1,6 +1,5 @@
 package com.example.labo8
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,16 +36,30 @@ fun TaskListScreen(
     onDeleteAll: () -> Unit,
     onFabClick: () -> Unit,
     onEdit: (Task) -> Unit,
-    deleteTask: (Int) -> Unit
+    deleteTask: (Int) -> Unit,
+    uncompletedTasksCount: Int = 0
 ) {
     Scaffold(
         topBar = {
             TopBar(
-                title = "Today",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFFBFBF9)),
-                onDeleteAll = onDeleteAll
+                modifier = Modifier.fillMaxWidth(),
+                onDeleteAll = onDeleteAll,
+                titleContent = {
+                    Column {
+                        Text(
+                            text = "Today",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Text(
+                            text = if (uncompletedTasksCount == 0)
+                                "Estás al día"
+                            else
+                                "Tareas pendientes: $uncompletedTasksCount",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
             )
         },
         bottomBar = { BottomBar() },
