@@ -1,0 +1,40 @@
+package com.example.labo8
+
+class FakeTaskViewModel : TaskViewModel(
+    dao = object : TaskDao {
+        private var tasks = mutableListOf<Task>(
+            Task(id = 1, description = "Escribir poesía", isCompleted = false),
+            Task(id = 2, description = "Leer libros antiguos", isCompleted = true)
+        )
+
+        override suspend fun getAllTasks(): List<Task> = tasks
+
+        override suspend fun insertTask(task: Task) {
+            tasks.add(task.copy(id = tasks.size + 1))
+        }
+
+        override suspend fun updateTask(task: Task) {
+            tasks = tasks.map { if (it.id == task.id) task else it }.toMutableList()
+        }
+
+        override suspend fun deleteAllTasks() {
+            tasks.clear()
+        }
+
+        override suspend fun deleteTask(id: Int) {
+            tasks = tasks.filter { it.id != id }.toMutableList()
+        }
+
+        override suspend fun updateTask(
+            id: Int,
+            description: String,
+            isCompleted: Boolean
+        ) {
+            tasks = tasks.map { if (it.id == id) it.copy(description = description, isCompleted = isCompleted) else it }.toMutableList()
+        }
+
+        override suspend fun getUncompletedTasksCount(): Int {
+            return tasks.count { !it.isCompleted }
+        }
+    }
+)
